@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronRight } from 'lucide-react'
 import RivaBeachBar from './RivaBeachBar'
 import RivaRestaurant from './RivaRestaurant'
 import RivaAperitivi from './RivaAperitivi'
