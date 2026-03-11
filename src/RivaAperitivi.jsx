@@ -113,7 +113,7 @@ export default function RivaAperitivi({ onBack }) {
       </div>
 
       {/* CONTENT AREA */}
-      <div className="px-4 -mt-2 relative z-20 pb-32">
+      <div className="px-4 mt-4 relative z-20 pb-32">
         <AnimatePresence mode="wait">
           
           {/* STEP 1: SCEGLI IL PACCHETTO */}
