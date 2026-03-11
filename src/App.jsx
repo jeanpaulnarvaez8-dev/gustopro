@@ -41,7 +41,7 @@ function App() {
         <div className="max-w-md mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span className="text-2xl">🌊</span>
-            <h1 className="text-xl font-bold tracking-tight text-blue-900">Riva Beach</h1>
+            <h1 className="text-xl font-bold tracking-tight text-blue-900">Riva Beach 🌊</h1>
           </div>
           <button className="p-2 rounded-full hover:bg-neutral-100 transition">
             <span className="text-xl">👤</span>
