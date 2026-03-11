@@ -10,7 +10,7 @@ const APERITIVO_PACKAGES = [
     desc: 'Calice di Franciacorta o cocktail a scelta, accompagnato da un plateau royale di crudi di mare e finger food gourmet.', 
     price: 35.00, 
     popular: true,
-    image: 'https://images.unsplash.com/photo-1517242081190-bbc9bce29b4e?auto=format&fit=crop&q=80&w=600&h=400' 
+    image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=600&h=400' 
   },
   { 
     id: 'classic', 
@@ -82,7 +82,7 @@ export default function RivaAperitivi({ onBack }) {
   }
 
   return (
-    <div className="bg-neutral-50 min-h-screen font-sans">
+    <div className="bg-neutral-50 min-h-screen font-sans max-w-md mx-auto relative shadow-2xl overflow-hidden">
       
       {/* HEADER HERO */}
       <div className="bg-rose-600 text-white p-6 pb-20 rounded-b-[2rem] relative overflow-hidden shadow-lg">
@@ -113,7 +113,7 @@ export default function RivaAperitivi({ onBack }) {
       </div>
 
       {/* CONTENT AREA */}
-      <div className="px-4 -mt-8 relative z-20 pb-32">
+      <div className="px-4 -mt-2 relative z-20 pb-32">
         <AnimatePresence mode="wait">
           
           {/* STEP 1: SCEGLI IL PACCHETTO */}
@@ -261,7 +261,7 @@ export default function RivaAperitivi({ onBack }) {
       {/* BOTTOM ACTION BAR */}
       <motion.div 
         initial={{ y: 100 }} animate={{ y: 0 }}
-        className="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-xl border-t border-neutral-100/50 p-4 pb-safe z-40"
+        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/80 backdrop-blur-xl border-t border-neutral-100/50 p-4 pb-safe z-40"
       >
         <div className="max-w-md mx-auto">
           {step === 3 ? (

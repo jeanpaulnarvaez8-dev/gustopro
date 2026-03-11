@@ -27,7 +27,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-800 font-sans selection:bg-blue-200">
+    <div className="min-h-screen bg-neutral-50 text-neutral-800 font-sans selection:bg-blue-200 max-w-md mx-auto relative shadow-2xl overflow-hidden">
       {/* HEADER */}
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-md mx-auto px-4 py-4 flex justify-between items-center">
@@ -94,7 +94,7 @@ function App() {
       </main>
 
       {/* BOTTOM NAV BAR */}
-      <nav className="fixed bottom-0 w-full bg-white border-t border-neutral-100 pb-safe">
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-neutral-100 pb-safe z-40">
         <div className="max-w-md mx-auto flex justify-around p-3">
           <button className="flex flex-col items-center gap-1 text-blue-600">
             <span>🏠</span>

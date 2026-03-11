@@ -201,7 +201,7 @@ export default function RivaRestaurant({ onBack }) {
 
 
   return (
-    <div className="bg-neutral-50 min-h-screen font-sans">
+    <div className="bg-neutral-50 min-h-screen font-sans max-w-md mx-auto relative shadow-2xl overflow-hidden">
       {/* HEADER HERO */}
       <div className="bg-blue-900 text-white p-6 pb-24 rounded-b-[2rem] relative overflow-hidden shadow-lg">
         <div className="absolute -right-20 -top-20 w-80 h-80 bg-blue-500/20 rounded-full blur-[80px]"></div>
@@ -257,7 +257,7 @@ export default function RivaRestaurant({ onBack }) {
       {step < 4 && (
         <motion.div 
           initial={{ y: 100 }} animate={{ y: 0 }}
-          className="fixed bottom-0 left-0 w-full bg-white border-t border-neutral-100 p-4 pb-safe z-40"
+          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-neutral-100 p-4 pb-safe z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]"
         >
           <div className="max-w-md mx-auto">
             {step === 3 ? (

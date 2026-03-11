@@ -87,7 +87,7 @@ export default function RivaBeachBar({ onBack }) {
   }
 
   return (
-    <div className="bg-neutral-50 min-h-screen font-sans selection:bg-orange-200">
+    <div className="bg-neutral-50 min-h-screen font-sans selection:bg-orange-200 max-w-md mx-auto relative shadow-2xl overflow-hidden">
       
       {/* HEADER HERO */}
       <div className="bg-neutral-900 text-white p-6 pb-20 rounded-b-[2rem] relative overflow-hidden shadow-lg border-b border-orange-500/20">
@@ -199,7 +199,7 @@ export default function RivaBeachBar({ onBack }) {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-6 left-0 w-full px-4 z-40"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-40"
           >
             <button 
               onClick={handleCheckout}
@@ -242,7 +242,7 @@ export default function RivaBeachBar({ onBack }) {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed bottom-0 left-0 w-full bg-white rounded-t-[2.5rem] z-50 pt-2 pb-safe"
+              className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white rounded-t-[2.5rem] z-50 pt-2 pb-safe shadow-2xl"
             >
               <div className="w-12 h-1.5 bg-neutral-200 rounded-full mx-auto my-3"></div>
               
