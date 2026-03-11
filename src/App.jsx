@@ -4,6 +4,7 @@ import RivaRestaurant from './RivaRestaurant'
 import RivaAperitivi from './RivaAperitivi'
 import RivaVip from './RivaVip'
 import RivaTakeaway from './RivaTakeaway'
+import RivaEvents from './RivaEvents'
 
 const services = [
   { id: 'bar', name: 'Riva Beach Bar', icon: '🍸', desc: 'Drink, snack & ordini ombrellone', color: 'bg-orange-500' },
@@ -33,6 +34,9 @@ function App() {
   if (activeArea === 'takeaway') {
     return <RivaTakeaway onBack={() => setActiveArea(null)} />
   }
+  if (activeArea === 'events') {
+    return <RivaEvents onBack={() => setActiveArea(null)} />
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-800 font-sans selection:bg-blue-200 max-w-md mx-auto relative shadow-2xl overflow-hidden">
@@ -41,7 +45,7 @@ function App() {
         <div className="max-w-md mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span className="text-2xl">🌊</span>
-            <h1 className="text-xl font-bold tracking-tight text-blue-900">Riva Beach 🌊</h1>
+            <h1 className="text-xl font-bold tracking-tight text-blue-900">Riva Beach</h1>
           </div>
           <button className="p-2 rounded-full hover:bg-neutral-100 transition">
             <span className="text-xl">👤</span>
