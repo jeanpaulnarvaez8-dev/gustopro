@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Search, ShoppingBag, Home } from 'lucide-react'
 import RivaBeachBar from './RivaBeachBar'
 import RivaRestaurant from './RivaRestaurant'
 import RivaAperitivi from './RivaAperitivi'
@@ -9,12 +9,12 @@ import RivaTakeaway from './RivaTakeaway'
 import RivaEvents from './RivaEvents'
 
 const services = [
-  { id: 'bar', name: 'Riva Beach Bar', icon: '🍸', desc: 'Cocktail & Food sul lettino', image: 'https://images.unsplash.com/photo-1572116469696-31de0f17cc3b?auto=format&fit=crop&q=80&w=800&h=600' },
-  { id: 'restaurant', name: 'Riva Restaurant', icon: '🍽️', desc: 'Fine dining vista mare', image: 'https://images.unsplash.com/photo-1544124499-58912cbddada?auto=format&fit=crop&q=80&w=800&h=600' },
-  { id: 'aperitive', name: 'Riva Aperitivi', icon: '🌅', desc: 'Sunset Experience Salento', image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=800&h=600' },
-  { id: 'vip', name: 'Riva VIP', icon: '👑', desc: 'Cabane & Bottle Service', image: 'https://images.unsplash.com/photo-1490650404312-a2175773bbf5?auto=format&fit=crop&q=80&w=800&h=600' },
-  { id: 'takeaway', name: 'Prendi e Vai', icon: '🥡', desc: 'Salta la fila, goditi il sole', image: 'https://images.unsplash.com/photo-1560611588-b6bd5720f6c1?auto=format&fit=crop&q=80&w=800&h=600' },
-  { id: 'events', name: 'Riva Eventi', icon: '🎉', desc: 'Matrimoni & Feste Private', image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&q=80&w=800&h=600' },
+  { id: 'restaurant', name: 'Riva Restaurant', icon: '🍽️', desc: 'Fine dining & specialità di pesce', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800&h=600' },
+  { id: 'bar', name: 'Riva Beach Bar', icon: '🍸', desc: 'Cocktail & Food servito all\'ombrellone', image: 'https://images.unsplash.com/photo-1544148103-0773bf10d330?auto=format&fit=crop&q=80&w=800&h=600' },
+  { id: 'aperitive', name: 'Riva Aperitivi', icon: '🌅', desc: 'L\'emozione del tramonto salentino', image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=800&h=600' },
+  { id: 'vip', name: 'Riva VIP', icon: '👑', desc: 'Cabane esclusive e Bottle Service', image: 'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&q=80&w=800&h=600' },
+  { id: 'takeaway', name: 'Prendi e Vai', icon: '🥡', desc: 'Ordina online e ritira senza attese', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800&h=600' },
+  { id: 'events', name: 'Riva Eventi', icon: '🎉', desc: 'Matrimoni, Feste & Eventi Private', image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&q=80&w=800&h=600' },
 ]
 
 function App() {
@@ -41,96 +41,103 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] text-neutral-800 font-sans selection:bg-blue-200 max-w-md mx-auto relative shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-brand-cream text-brand-slate font-sans selection:bg-brand-gold/20 max-w-md mx-auto relative shadow-2xl overflow-hidden border-x border-brand-gold/10">
       
       {/* HERO SECTION */}
-      <div className="relative h-[45vh] overflow-hidden">
+      <div className="relative h-[48vh] overflow-hidden">
         <img 
-          src="https://images.unsplash.com/photo-1533727937480-da3a97967e95?auto=format&fit=crop&q=100&w=1200&h=800" 
-          alt="Riva Beach Punta Prosciutto" 
-          className="w-full h-full object-cover scale-110 animate-subtle-zoom"
+          src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=95&w=1200&h=800" 
+          alt="Riva Beach Salento" 
+          className="w-full h-full object-cover scale-105 animate-subtle-zoom"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#f8f9fa] via-black/20 to-black/40"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-cream via-transparent to-black/30"></div>
         
-        <div className="absolute top-6 left-6 right-6 flex justify-between items-center">
-          <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 flex items-center gap-2">
-             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-             <span className="text-[10px] font-bold text-white uppercase tracking-widest">Aperto ora</span>
+        {/* LOGO AREA */}
+        <div className="absolute top-10 left-0 right-0 flex flex-col items-center">
+          <div className="flex flex-col items-center gap-1">
+             <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em] mb-1">Benvenuti a</span>
+             <h1 className="text-4xl font-serif font-black text-brand-burgundy tracking-tight drop-shadow-sm flex flex-col items-center">
+               Riva Beach
+               <span className="text-brand-gold text-lg tracking-widest mt-[-8px]">SALENTO</span>
+             </h1>
           </div>
-          <button className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white">
-            <span>👤</span>
-          </button>
         </div>
 
-        <div className="absolute bottom-10 left-6 right-6">
-          <h1 className="text-4xl font-black text-white leading-tight tracking-tighter drop-shadow-lg">
-            Riva Beach <br/><span className="text-blue-200">Experience</span>
-          </h1>
-          <p className="text-white/80 text-sm font-medium mt-2 max-w-[240px]">L'anima del Salento a Punta Prosciutto.</p>
+        <div className="absolute bottom-12 left-8 right-8">
+          <p className="text-brand-burgundy font-serif italic text-xl">L'eleganza del mare,</p>
+          <p className="text-brand-slate font-bold text-sm uppercase tracking-widest opacity-80">Punta Prosciutto</p>
         </div>
       </div>
 
-      {/* SEARCH/QUICK LINKS BAR */}
-      <div className="px-6 -mt-6 relative z-10">
-        <div className="bg-white rounded-2xl shadow-xl shadow-black/5 p-4 flex justify-between items-center border border-neutral-100">
-          <div className="flex flex-col">
-            <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">Cosa cerchi?</span>
-            <span className="text-sm font-bold text-neutral-800">Scegli il tuo Riva...</span>
+      {/* QUICK STATUS */}
+      <div className="px-8 -mt-6 relative z-10 flex justify-center">
+        <div className="bg-white px-6 py-3 rounded-full shadow-lg border border-brand-gold/20 flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span className="text-[10px] font-bold text-brand-slate/60 uppercase tracking-widest">Aperto ora</span>
           </div>
-          <span className="text-2xl opacity-30">🌊</span>
+          <div className="h-4 w-[1px] bg-brand-gold/30"></div>
+          <span className="text-brand-gold text-xs font-bold tracking-widest uppercase">Fine Dining Beach</span>
         </div>
       </div>
 
       {/* SERVICE LIST */}
-      <main className="px-6 py-8 pb-32 space-y-6">
-        <div className="flex justify-between items-end mb-2">
-          <h2 className="text-sm font-bold text-neutral-400 uppercase tracking-widest">Servizi Esclusivi</h2>
-          <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">2026 EDITION</span>
+      <main className="px-6 py-10 pb-32 space-y-8">
+        <div className="text-center">
+          <div className="h-[1px] w-12 bg-brand-gold mx-auto mb-3"></div>
+          <h2 className="text-sm font-bold text-brand-gold uppercase tracking-[0.4em] mb-1">Esplora il Riva</h2>
+          <p className="text-brand-slate/50 text-[10px] uppercase font-bold tracking-wider">Esperienze d'Eccellenza</p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           {services.map((service, idx) => (
             <motion.button
               key={service.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.05 }}
               onClick={() => setActiveArea(service.id)}
-              className="w-full relative h-32 rounded-[2rem] overflow-hidden group shadow-md hover:shadow-xl transition-all active:scale-[0.98]"
+              className="w-full relative group outline-none"
             >
-              <img src={service.image} alt={service.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent group-hover:from-black/90 transition-all"></div>
-              
-              <div className="absolute inset-0 p-6 flex flex-col justify-center items-start">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xl scale-125 group-hover:rotate-12 transition-transform">{service.icon}</span>
-                  <h3 className="text-white font-black text-xl tracking-tight">{service.name}</h3>
+              <div className="relative h-44 rounded-2xl overflow-hidden shadow-sm transition-all duration-500 group-hover:shadow-xl group-hover:shadow-brand-gold/10">
+                <img src={service.image} alt={service.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-brand-slate/10 group-hover:bg-brand-burgundy/20 transition-all duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-slate/80 via-transparent to-transparent"></div>
+                
+                {/* BOTTOM TITLE BAR */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 flex justify-between items-end">
+                  <div className="text-left">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xl drop-shadow-md">{service.icon}</span>
+                      <h3 className="text-white font-serif text-2xl font-bold tracking-tight">{service.name}</h3>
+                    </div>
+                    <p className="text-white/70 text-[10px] font-bold uppercase tracking-widest leading-none">{service.desc}</p>
+                  </div>
+                  <div className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                    <ChevronRight size={14} />
+                  </div>
                 </div>
-                <p className="text-white/70 text-xs font-medium">{service.desc}</p>
-              </div>
-
-              <div className="absolute right-6 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                <ChevronRight size={16} className="text-white" />
               </div>
             </motion.button>
           ))}
         </div>
       </main>
 
-      {/* BOTTOM NAV BAR (REFINED) */}
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/80 backdrop-blur-xl border-t border-neutral-100 pb-safe z-50">
-        <div className="max-w-md mx-auto flex justify-around p-4">
+      {/* BOTTOM NAV BAR (MINIMAL LUXURY) */}
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 backdrop-blur-md border-t border-brand-gold/10 pb-safe z-50">
+        <div className="max-w-md mx-auto flex justify-around p-4 items-center">
           <button className="flex flex-col items-center gap-1 group">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30">🏠</div>
-            <span className="text-[10px] font-bold text-blue-600">Home</span>
+            <div className="text-brand-burgundy font-bold text-lg"><Home size={20} /></div>
+            <span className="text-[9px] font-bold text-brand-burgundy uppercase tracking-widest">Home</span>
           </button>
-          <button className="flex flex-col items-center gap-1 text-neutral-400 opacity-60">
-            <div className="w-10 h-10 flex items-center justify-center">🔍</div>
-            <span className="text-[10px] font-bold">Esplora</span>
+          <button className="flex flex-col items-center gap-1 text-brand-slate/30">
+            <Search size={20} />
+            <span className="text-[9px] font-bold uppercase tracking-widest">Menu</span>
           </button>
-          <button className="flex flex-col items-center gap-1 text-neutral-400 opacity-60">
-            <div className="w-10 h-10 flex items-center justify-center">🛒</div>
-            <span className="text-[10px] font-bold">Ordini</span>
+          <button className="flex flex-col items-center gap-1 text-brand-slate/30">
+            <ShoppingBag size={20} />
+            <span className="text-[9px] font-bold uppercase tracking-widest">Carrello</span>
           </button>
         </div>
       </nav>
@@ -138,17 +145,16 @@ function App() {
   )
 }
 
-const style = document.createElement('style')
-style.innerHTML = `
+const styleElement = document.createElement('style')
+styleElement.innerHTML = `
 @keyframes subtle-zoom {
-  0% { transform: scale(1.1); }
-  100% { transform: scale(1.2); }
+  0% { transform: scale(1.05); }
+  100% { transform: scale(1.15); }
 }
 .animate-subtle-zoom {
-  animation: subtle-zoom 20s infinite alternate ease-in-out;
+  animation: subtle-zoom 30s infinite alternate ease-in-out;
 }
 `
-document.head.appendChild(style)
-
+document.head.appendChild(styleElement)
 
 export default App

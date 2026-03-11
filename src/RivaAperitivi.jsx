@@ -64,89 +64,96 @@ export default function RivaAperitivi({ onBack }) {
 
   if (orderComplete) {
     return (
-      <div className="min-h-screen bg-rose-600 flex flex-col items-center justify-center p-6 text-center animate-fade-in text-white">
+      <div className="min-h-screen bg-brand-cream flex flex-col items-center justify-center p-8 text-center animate-fade-in text-brand-slate">
         <motion.div 
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 20 }}
-          className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6"
+          className="w-24 h-24 bg-brand-burgundy rounded-full flex items-center justify-center mb-10 shadow-2xl shadow-brand-burgundy/30"
         >
-          <Sunset size={48} className="text-rose-600" />
+          <Sunset size={48} className="text-white" />
         </motion.div>
-        <h2 className="text-3xl font-black mb-2">Aperitivo Confermato!</h2>
-        <p className="text-rose-100 mb-8 max-w-[280px]">
-          Il tuo tavolo per goderti il tramonto è riservato. Presentati in reception all'orario scelto.
+        <h2 className="text-4xl font-serif font-black text-brand-burgundy mb-4 tracking-tight">Sunset Reserved</h2>
+        <p className="text-brand-slate/60 font-bold text-xs uppercase tracking-[0.3em] mb-12 max-w-[280px] leading-relaxed">
+          Il tuo tavolo per goderti il tramonto è riservato. <br/>Ti aspettiamo al Riva.
         </p>
+        <button onClick={onBack} className="px-10 py-4 bg-brand-burgundy text-white rounded-full font-serif font-black text-lg shadow-xl active:scale-95 transition-all">
+          Torna alla Home
+        </button>
       </div>
     )
   }
 
   return (
-    <div className="bg-neutral-50 min-h-screen font-sans max-w-md mx-auto relative shadow-2xl overflow-hidden">
+    <div className="bg-brand-cream min-h-screen font-sans max-w-md mx-auto relative shadow-2xl overflow-hidden border-x border-brand-gold/10 text-brand-slate">
       
       {/* HEADER HERO */}
-      <div className="bg-rose-600 text-white p-6 pb-20 rounded-b-[2rem] relative overflow-hidden shadow-lg">
-        {/* Abstract sunset glow background */}
-        <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-orange-400/40 rounded-full blur-[80px]"></div>
-        <div className="absolute top-10 -left-10 w-40 h-40 bg-pink-500/40 rounded-full blur-[60px]"></div>
+      <div className="relative h-64 overflow-hidden">
+        <img 
+          src="https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&q=80&w=1000" 
+          alt="Aperitivo" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-cream via-brand-burgundy/10 to-black/30"></div>
         
         <button 
           onClick={step === 1 ? onBack : () => setStep(s => s - 1)}
-          className="relative z-10 mb-6 flex items-center gap-1 text-sm font-medium text-rose-200 hover:text-white transition-colors"
+          className="absolute top-6 left-6 z-10 w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg"
         >
-          <ChevronLeft size={18} /> {step === 1 ? 'Home' : 'Indietro'}
+          <ChevronLeft size={20} />
         </button>
         
-        <div className="relative z-10">
-          <h2 className="text-3xl md:text-4xl font-black mb-2 tracking-tight">Riva Aperitivi</h2>
-          <p className="text-rose-100 text-sm md:text-base font-medium flex items-center gap-2">
-            <Sunset size={16} /> Goditi il tramonto perfetto
-          </p>
+        <div className="absolute bottom-12 left-8 right-8 text-left">
+          <div className="h-[1px] w-8 bg-brand-gold mb-3"></div>
+          <h2 className="text-4xl font-serif font-black text-white px-0 tracking-tight leading-none italic">Aperitivi</h2>
+          <p className="text-white/80 text-[10px] uppercase font-black tracking-[0.4em] mt-2">The Sunset Experience</p>
         </div>
 
         {/* PROGRESS INDICATOR */}
-        <div className="absolute bottom-6 left-6 flex gap-2">
-          {[1, 2, 3].map(i => (
-            <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${step >= i ? 'w-8 bg-white' : 'w-4 bg-rose-400/50'}`}></div>
-          ))}
+        <div className="absolute bottom-4 left-0 right-0 px-8 flex gap-1">
+           <div className={`h-1 flex-1 transition-all duration-700 ${step >= 1 ? 'bg-brand-gold' : 'bg-white/10'}`}></div>
+           <div className={`h-1 flex-1 transition-all duration-700 ${step >= 2 ? 'bg-brand-gold' : 'bg-white/10'}`}></div>
+           <div className={`h-1 flex-1 transition-all duration-700 ${step >= 3 ? 'bg-brand-gold' : 'bg-white/10'}`}></div>
         </div>
       </div>
 
       {/* CONTENT AREA */}
-      <div className="px-4 mt-4 relative z-20 pb-32">
+      <div className="px-6 py-10 relative z-20 pb-40">
         <AnimatePresence mode="wait">
           
           {/* STEP 1: SCEGLI IL PACCHETTO */}
           {step === 1 && (
-            <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-              <h3 className="font-bold text-neutral-500 px-2 text-sm uppercase tracking-wider mb-2">Scegli la tua esperienza</h3>
+            <motion.div key="step1" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-6">
+              <div className="text-center mb-4">
+                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold">Seleziona Esperienza</p>
+              </div>
               
               {APERITIVO_PACKAGES.map(pkg => (
                 <label 
                   key={pkg.id}
-                  className={`block relative overflow-hidden rounded-3xl transition-all cursor-pointer bg-white border-2 ${
-                    selectedPackage?.id === pkg.id ? 'border-rose-500 shadow-xl scale-[1.02]' : 'border-transparent shadow-sm hover:shadow-md'
+                  className={`block relative overflow-hidden rounded-[2.5rem] transition-all duration-700 cursor-pointer bg-white border shadow-sm ${
+                    selectedPackage?.id === pkg.id ? 'border-brand-gold shadow-2xl shadow-brand-gold/10 scale-[1.02]' : 'border-brand-gold/5'
                   }`}
                 >
                   <input type="radio" name="package" className="hidden" onChange={() => setSelectedPackage(pkg)} />
-                  <div className="h-32 relative">
+                  <div className="h-40 relative">
                     <img src={pkg.image} alt={pkg.name} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-brand-burgundy/90 via-transparent to-black/20"></div>
                     {pkg.popular && (
-                      <div className="absolute top-3 right-3 bg-gradient-to-r from-orange-400 to-rose-500 text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
-                        <Star size={12} className="fill-white" /> Più richiesto
+                      <div className="absolute top-4 right-4 bg-brand-gold text-brand-burgundy text-[9px] font-black uppercase px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1">
+                        <Star size={12} className="fill-brand-burgundy" /> Best Choice
                       </div>
                     )}
-                    <div className="absolute bottom-3 left-4 right-4 flex justify-between items-end">
-                      <h3 className="text-white font-black text-xl leading-tight w-2/3">{pkg.name}</h3>
-                      <span className="text-white font-bold bg-white/20 backdrop-blur-md px-3 py-1 rounded-xl">€{pkg.price} <span className="text-[10px] font-normal opacity-80">/pax</span></span>
+                    <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
+                      <h3 className="text-white font-serif font-black text-2xl tracking-tight leading-none italic">{pkg.name}</h3>
+                      <span className="text-brand-gold font-serif font-black text-xl italic drop-shadow-md">€{pkg.price}</span>
                     </div>
                   </div>
-                  <div className="p-4 bg-white">
-                    <p className="text-sm text-neutral-500 leading-relaxed font-medium">{pkg.desc}</p>
+                  <div className="p-6">
+                    <p className="text-xs text-brand-slate/50 leading-relaxed font-bold uppercase tracking-wider">{pkg.desc}</p>
                     {selectedPackage?.id === pkg.id && (
-                      <div className="mt-3 flex items-center gap-2 text-rose-600 font-bold text-sm">
-                        <CheckCircle2 size={16} /> Selezionato
+                      <div className="mt-4 flex items-center gap-2 text-brand-burgundy font-black text-[10px] uppercase tracking-widest">
+                        <CheckCircle2 size={14} /> Pacchetto Selezionato
                       </div>
                     )}
                   </div>
@@ -157,41 +164,44 @@ export default function RivaAperitivi({ onBack }) {
 
           {/* STEP 2: DETTAGLI PRENOTAZIONE */}
           {step === 2 && (
-            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+            <motion.div key="step2" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-8">
               
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-neutral-100">
-                <h4 className="font-bold text-neutral-900 mb-4 flex items-center gap-2"><Sunset size={18} className="text-rose-500"/> Quante persone?</h4>
-                <div className="flex items-center justify-between bg-neutral-50 p-2 rounded-2xl">
-                  <button onClick={() => setGuests(Math.max(1, guests - 1))} className="w-12 h-12 bg-white rounded-xl shadow-sm text-xl font-medium">-</button>
-                  <span className="text-2xl font-black">{guests}</span>
-                  <button onClick={() => setGuests(Math.min(15, guests + 1))} className="w-12 h-12 bg-white rounded-xl shadow-sm text-xl font-medium">+</button>
+              <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-brand-gold/5 text-center">
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold mb-6 block">Quanti Ospiti?</label>
+                <div className="flex items-center justify-between bg-brand-cream/50 p-2 rounded-2xl border border-brand-gold/5 max-w-[200px] mx-auto">
+                  <button onClick={() => setGuests(Math.max(1, guests - 1))} className="w-12 h-12 bg-white rounded-xl shadow-sm border border-brand-gold/10 text-xl font-serif font-black text-brand-burgundy">-</button>
+                  <span className="text-3xl font-serif font-black text-brand-burgundy">{guests}</span>
+                  <button onClick={() => setGuests(Math.min(15, guests + 1))} className="w-12 h-12 bg-white rounded-xl shadow-sm border border-brand-gold/10 text-xl font-serif font-black text-brand-burgundy">+</button>
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-neutral-100">
-                <h4 className="font-bold text-neutral-900 mb-4 flex items-center gap-2"><Clock size={18} className="text-rose-500"/> Orario di arrivo</h4>
-                <div className="grid gap-3">
+              <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-brand-gold/5">
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold mb-6 block text-center">Scegli la Fascia Oraria</label>
+                <div className="grid gap-4">
                   {TIME_SLOTS.map(t => (
-                    <label key={t} className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer ${time === t ? 'border-rose-500 bg-rose-50/50' : 'border-neutral-100 hover:border-rose-200'}`}>
-                      <span className={`font-bold ${time === t ? 'text-rose-700' : 'text-neutral-700'}`}>{t}</span>
-                      <input type="radio" name="time" className="w-5 h-5 accent-rose-500" onChange={() => setTime(t)} checked={time === t} />
+                    <label key={t} className={`flex items-center justify-between p-5 rounded-[1.5rem] border-2 transition-all duration-500 cursor-pointer ${time === t ? 'border-brand-burgundy bg-brand-burgundy/5' : 'border-brand-gold/5 hover:border-brand-gold/20'}`}>
+                      <span className={`font-serif font-bold text-lg ${time === t ? 'text-brand-burgundy' : 'text-brand-slate/60'}`}>{t}</span>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${time === t ? 'border-brand-burgundy bg-brand-burgundy' : 'border-brand-gold/20'}`}>
+                         {time === t && <CheckCircle2 size={14} className="text-white" />}
+                      </div>
+                      <input type="radio" name="time" className="hidden" onChange={() => setTime(t)} checked={time === t} />
                     </label>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-neutral-100">
-                <h4 className="font-bold text-neutral-900 mb-4 flex items-center gap-2"><MapPin size={18} className="text-rose-500"/> Scegli la location</h4>
-                <div className="grid gap-3">
+              <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-brand-gold/5">
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold mb-6 block text-center">Preferenza Area</label>
+                <div className="grid gap-4">
                   {ZONES.map(z => (
-                    <label key={z.id} className={`p-4 rounded-2xl border-2 transition-all cursor-pointer ${zone === z.id ? 'border-rose-500 bg-rose-50/50' : 'border-neutral-100'}`}>
-                      <div className="flex justify-between items-start mb-1">
-                        <span className={`font-bold ${zone === z.id ? 'text-rose-700' : 'text-neutral-900'}`}>{z.name}</span>
-                        <input type="radio" name="zone" className="w-5 h-5 accent-rose-500" onChange={() => setZone(z.id)} checked={zone === z.id} />
+                    <label key={z.id} className={`p-5 rounded-[1.5rem] border-2 transition-all duration-500 cursor-pointer ${zone === z.id ? 'border-brand-burgundy bg-brand-burgundy/5 shadow-lg shadow-brand-burgundy/5' : 'border-brand-gold/5'}`}>
+                      <div className="flex justify-between items-start mb-2">
+                        <span className={`font-serif font-bold text-lg ${zone === z.id ? 'text-brand-burgundy' : 'text-brand-slate'}`}>{z.name}</span>
+                        <input type="radio" name="zone" className="hidden" onChange={() => setZone(z.id)} checked={zone === z.id} />
                       </div>
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-neutral-500">{z.desc}</span>
-                        {z.price > 0 && <span className="font-bold text-rose-600">+€{z.price}</span>}
+                      <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
+                        <span className="text-brand-slate/40 italic">{z.desc}</span>
+                        {z.price > 0 && <span className="text-brand-gold font-black">+€{z.price}</span>}
                       </div>
                     </label>
                   ))}
@@ -203,53 +213,46 @@ export default function RivaAperitivi({ onBack }) {
 
           {/* STEP 3: RIEPILOGO & CHECKOUT */}
           {step === 3 && (
-            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-neutral-100 overflow-hidden relative">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-rose-50 rounded-bl-[100px] -z-10"></div>
+            <motion.div key="step3" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-8">
+              <div className="bg-white p-10 rounded-[3rem] shadow-xl border border-brand-gold/5 relative overflow-hidden flex flex-col items-center">
+                <div className="h-[1px] w-12 bg-brand-gold mb-8 opacity-30"></div>
+                <h3 className="font-serif text-3xl font-black text-brand-burgundy mb-10 italic">Riepilogo</h3>
                 
-                <h3 className="font-black text-2xl mb-6 text-neutral-900">Riepilogo</h3>
-                
-                <div className="space-y-5 mb-8 relative z-10">
-                  <div className="flex justify-between items-start border-b border-neutral-100 pb-4">
-                    <div>
-                      <span className="text-xs font-bold text-rose-500 uppercase tracking-wider block mb-1">Esperienza Scelta</span>
-                      <span className="font-bold text-neutral-900 text-lg">{selectedPackage.name}</span>
-                    </div>
+                <div className="w-full space-y-8 mb-12">
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-[9px] font-black text-brand-gold uppercase tracking-[0.3em]">Esperienza</span>
+                    <span className="font-serif text-2xl font-bold text-brand-burgundy italic text-center leading-tight">{selectedPackage.name}</span>
                   </div>
                   
-                  <div className="flex justify-between items-center">
-                    <span className="text-neutral-500 font-medium">Data e Ora</span>
-                    <span className="font-bold text-neutral-900">Oggi • {time}</span>
+                  <div className="flex justify-between items-center border-t border-brand-gold/10 pt-6">
+                    <span className="text-[9px] font-black text-brand-gold uppercase tracking-[0.2em]">Ospiti</span>
+                    <span className="font-serif text-xl font-bold text-brand-slate">{guests} Persone</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-neutral-500 font-medium">Ospiti</span>
-                    <span className="font-bold text-neutral-900">{guests} Persone</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-neutral-500 font-medium">Location</span>
-                    <span className="font-bold text-neutral-900">{ZONES.find(z => z.id === zone)?.name}</span>
+                  <div className="flex justify-between items-center border-t border-brand-gold/10 pt-6">
+                    <span className="text-[9px] font-black text-brand-gold uppercase tracking-[0.2em]">Orario</span>
+                    <span className="font-serif text-xl font-bold text-brand-slate">{time}</span>
                   </div>
                 </div>
 
-                <div className="bg-neutral-900 text-white p-5 rounded-2xl relative z-10 shadow-xl shadow-rose-900/10">
-                  <div className="flex justify-between items-center text-sm mb-3 text-neutral-300">
-                    <span>{guests}x {selectedPackage.name}</span>
-                    <span>€{pkgPrice * guests}</span>
+                <div className="w-full bg-brand-burgundy text-white p-8 rounded-[2rem] relative shadow-2xl shadow-brand-burgundy/20 mt-4">
+                  <div className="flex justify-between items-center text-[10px] uppercase font-black tracking-widest mb-4 opacity-50">
+                    <span>Package Total</span>
+                    <span>€{(pkgPrice * guests).toFixed(2)}</span>
                   </div>
                   {zonePrice > 0 && (
-                    <div className="flex justify-between items-center text-sm mb-4 text-neutral-300">
-                      <span>Supplemento Area ({ZONES.find(z => z.id === zone)?.name})</span>
-                      <span>€{zonePrice}</span>
+                    <div className="flex justify-between items-center text-[10px] uppercase font-black tracking-widest mb-6 opacity-50">
+                      <span>Area Upgrade</span>
+                      <span>€{zonePrice.toFixed(2)}</span>
                     </div>
                   )}
-                  <div className="pt-4 border-t border-neutral-700 flex justify-between items-center font-black text-xl">
-                    <span>Totale</span>
-                    <span className="text-rose-400">€{total.toFixed(2)}</span>
+                  <div className="pt-6 border-t border-white/10 flex justify-between items-center font-serif font-black text-3xl italic">
+                    <span className="text-brand-gold">Totale</span>
+                    <span className="text-white">€{total.toFixed(2)}</span>
                   </div>
                 </div>
                 
-                <p className="text-xs text-neutral-400 text-center flex justify-center items-center gap-1 mt-4">
-                  <Info size={14} /> Nessun addebito anticipato. Paga al locale.
+                <p className="text-[8px] text-brand-slate/30 font-black uppercase tracking-[0.3em] mt-8 flex justify-center items-center gap-2">
+                   Pagamento in loco presso Riva Beach Salento
                 </p>
               </div>
             </motion.div>
@@ -261,23 +264,23 @@ export default function RivaAperitivi({ onBack }) {
       {/* BOTTOM ACTION BAR */}
       <motion.div 
         initial={{ y: 100 }} animate={{ y: 0 }}
-        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/80 backdrop-blur-xl border-t border-neutral-100/50 p-4 pb-safe z-40"
+        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 backdrop-blur-md border-t border-brand-gold/10 p-6 pb-safe z-[45] shadow-2xl"
       >
         <div className="max-w-md mx-auto">
           {step === 3 ? (
             <button 
               onClick={handleNext}
-              className="w-full bg-rose-600 text-white rounded-2xl p-4 font-bold text-lg hover:bg-rose-700 transition shadow-lg shadow-rose-600/30 active:scale-[0.98]"
+              className="w-full bg-brand-burgundy text-white rounded-2xl py-5 font-serif font-black text-xl hover:bg-black transition-all shadow-xl shadow-brand-burgundy/30 active:scale-95 flex items-center justify-center gap-3"
             >
-              Prenota il tuo Aperitivo
+              Conferma Sunset <ChevronRight size={20} className="text-brand-gold" />
             </button>
           ) : (
             <button 
               onClick={handleNext}
               disabled={(step === 1 && !selectedPackage) || (step === 2 && (!time || !zone))}
-              className="w-full bg-neutral-900 disabled:bg-neutral-200 disabled:text-neutral-400 text-white rounded-2xl p-4 font-bold text-lg flex items-center justify-center gap-2 transition hover:bg-black"
+              className="w-full bg-brand-burgundy disabled:bg-brand-slate/10 disabled:text-brand-slate/20 text-white rounded-2xl py-5 font-serif font-black text-xl flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-brand-burgundy/20"
             >
-              {step === 1 ? 'Configura Prenotazione' : 'Vai al Riepilogo'} <ChevronRight size={20} />
+              {step === 1 ? 'Personalizza' : 'Rivedi Dettagli'} <ChevronRight size={20} className="text-brand-gold" />
             </button>
           )}
         </div>

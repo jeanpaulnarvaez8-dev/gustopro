@@ -1,1 +1,26 @@
 @import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Jost:wght@300;400;500;600;700&display=swap');
+
+@theme {
+  --font-sans: "Jost", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  
+  --color-brand-burgundy: #8B1D23;
+  --color-brand-gold: #C5A059;
+  --color-brand-cream: #FAF9F6;
+  --color-brand-slate: #1A1A1A;
+}
+
+:root {
+  background-color: var(--color-brand-cream);
+  color: var(--color-brand-slate);
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, .font-serif {
+  font-family: var(--font-serif);
+}
