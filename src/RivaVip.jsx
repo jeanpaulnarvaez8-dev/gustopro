@@ -4,8 +4,8 @@ import { ChevronLeft, Crown, MessageCircle, GlassWater, Sparkles, Plus, Minus, C
 
 // VIP Mock Data
 const VIP_LOCATIONS = [
-  { id: 'cabana', name: 'Grand Cabana', desc: 'Fino a 6 persone con jacuzzi privata e tendaggi di lino.', price: 250, image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=800&h=600' },
-  { id: 'gazebo', name: 'Ocean Gazebo', desc: 'Fino a 4 persone, letto king size a due passi dalla riva.', price: 150, image: 'https://images.unsplash.com/photo-1563911302283-d2bc129e7570?auto=format&fit=crop&q=80&w=800&h=600' }
+  { id: 'cabana', name: 'Grand Cabana', desc: 'Fino a 6 persone, lettoni vista mare e mare cristallino.', price: 250, image: 'https://images.unsplash.com/photo-1490650404312-a2175773bbf5?auto=format&fit=crop&q=80&w=800&h=600' },
+  { id: 'gazebo', name: 'Le Dune Gazebo', desc: 'Fino a 4 persone, letto king size sulla sabbia bianca.', price: 150, image: 'https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&q=80&w=800&h=600' }
 ]
 
 const BOTTLE_SERVICE = [
