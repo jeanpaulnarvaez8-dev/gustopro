@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import RivaBeachBar from './RivaBeachBar'
+import RivaRestaurant from './RivaRestaurant'
 
 const services = [
   { id: 'bar', name: 'Riva Beach Bar', icon: '🍸', desc: 'Drink, snack & ordini ombrellone', color: 'bg-orange-500' },
@@ -16,6 +17,9 @@ function App() {
   // Render the selected area block
   if (activeArea === 'bar') {
     return <RivaBeachBar onBack={() => setActiveArea(null)} />
+  }
+  if (activeArea === 'restaurant') {
+    return <RivaRestaurant onBack={() => setActiveArea(null)} />
   }
 
   return (
