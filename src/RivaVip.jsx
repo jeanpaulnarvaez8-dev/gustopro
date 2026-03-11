@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, Crown, MessageCircle, GlassWater, Sparkles, Plus, Minus, CheckCircle2, ChevronRight, Calendar, Users } from 'lucide-react'
+import { ChevronLeft, Crown, MessageCircle, GlassWater, Sparkles, Plus, Minus, CheckCircle2, ChevronRight, Calendar, Users, MapPin } from 'lucide-react'
 
 // VIP Mock Data
 const VIP_LOCATIONS = [
