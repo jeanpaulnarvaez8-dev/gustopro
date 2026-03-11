@@ -3,6 +3,7 @@ import RivaBeachBar from './RivaBeachBar'
 import RivaRestaurant from './RivaRestaurant'
 import RivaAperitivi from './RivaAperitivi'
 import RivaVip from './RivaVip'
+import RivaTakeaway from './RivaTakeaway'
 
 const services = [
   { id: 'bar', name: 'Riva Beach Bar', icon: '🍸', desc: 'Drink, snack & ordini ombrellone', color: 'bg-orange-500' },
@@ -28,6 +29,9 @@ function App() {
   }
   if (activeArea === 'vip') {
     return <RivaVip onBack={() => setActiveArea(null)} />
+  }
+  if (activeArea === 'takeaway') {
+    return <RivaTakeaway onBack={() => setActiveArea(null)} />
   }
 
   return (
