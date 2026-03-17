@@ -1,0 +1,9 @@
+services:
+  gustopro-website:
+    build: .
+    container_name: gustopro-website
+    restart: unless-stopped
+    ports:
+      - "3010:80"
+    labels:
+      - "project=gustopro-website"
