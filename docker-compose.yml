@@ -7,3 +7,10 @@ services:
       - "3010:80"
     labels:
       - "project=gustopro-website"
+    networks:
+      - default
+      - npm-net
+
+networks:
+  npm-net:
+    external: true
