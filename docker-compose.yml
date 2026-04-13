@@ -1,15 +1,47 @@
 services:
-  gustopro-website:
+  db:
+    image: postgres:17-alpine
+    container_name: gustopro-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: gustopro
+      POSTGRES_USER: gustopro
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-gustopro_secret_2024}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gustopro"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
     build: .
     container_name: gustopro-website
     restart: unless-stopped
     ports:
-      - "3010:80"
+      - "3010:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      DATABASE_URL: postgresql://gustopro:${DB_PASSWORD:-gustopro_secret_2024}@db:5432/gustopro?schema=public
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      FROM_EMAIL: ${FROM_EMAIL:-noreply@gustopro.it}
+      FROM_NAME: ${FROM_NAME:-Riva Beach Salento}
     labels:
       - "project=gustopro-website"
     networks:
       - default
       - npm-net
+
+volumes:
+  pgdata:
 
 networks:
   npm-net:

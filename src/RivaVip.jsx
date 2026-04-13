@@ -1,31 +1,34 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, Crown, MessageCircle, GlassWater, Sparkles, Plus, Minus, CheckCircle2, ChevronRight, Calendar, Users, MapPin } from 'lucide-react'
-
-// VIP Mock Data
-const VIP_LOCATIONS = [
-  { id: 'cabana', name: 'Grand Cabana', desc: 'Fino a 6 persone, lettoni vista mare e mare cristallino.', price: 250, image: 'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&q=80&w=800&h=600' },
-  { id: 'gazebo', name: 'Le Dune Gazebo', desc: 'Fino a 4 persone, letto king size sulla sabbia bianca.', price: 150, image: 'https://images.unsplash.com/photo-1471922694854-ff1b63b20054?auto=format&fit=crop&q=80&w=800&h=600' }
-]
-
-const BOTTLE_SERVICE = [
-  { id: 'b1', name: 'Dom Pérignon Vintage', desc: 'Bottiglia (75cl) servita con ghiaccio e sparkle show al tavolo.', price: 350, image: 'https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: 'b2', name: 'Ruinart Blanc de Blancs', desc: 'Bottiglia (75cl) servita con fragole fresche e ghiaccio.', price: 180, image: 'https://images.unsplash.com/photo-1599576402092-1b1cc1b2d415?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: 'b3', name: 'Belvedere Vodka Luminous', desc: 'Formato Magnum (1.5L) con succhi di accompagnamento.', price: 300, image: 'https://images.unsplash.com/photo-1596484552993-8b7150c9535b?auto=format&fit=crop&q=80&w=400&h=400' },
-]
+import { ChevronLeft, Crown, MessageCircle, GlassWater, Sparkles, Plus, Minus, CheckCircle2, ChevronRight, Calendar, Users, MapPin, Loader2 } from 'lucide-react'
+import { catalog, bookings } from './lib/api'
 
 export default function RivaVip({ onBack }) {
-  const [activeTab, setActiveTab] = useState('booking') // booking, bottles, concierge
-  
+  const [VIP_LOCATIONS, setLocations] = useState([])
+  const [BOTTLE_SERVICE, setBottles] = useState([])
+  const [activeTab, setActiveTab] = useState('booking')
+
   // Booking State
   const [selectedLoc, setSelectedLoc] = useState(null)
   const [bookingDate, setBookingDate] = useState('')
   const [bookingGuests, setBookingGuests] = useState(2)
   const [checkoutStep, setCheckoutStep] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
+  const [customerName, setCustomerName] = useState('')
+  const [customerEmail, setCustomerEmail] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   // Bottles State
   const [bottlesCart, setBottlesCart] = useState({})
+
+  useEffect(() => {
+    catalog.vipPackages('CABANA').then(pkgs => {
+      setLocations(pkgs.map(p => ({ id: p.id, name: p.name, desc: p.description || '', price: Number(p.price), image: p.imageUrl || '' })))
+    })
+    catalog.vipPackages('BOTTLE').then(pkgs => {
+      setBottles(pkgs.map(p => ({ id: p.id, name: p.name, desc: p.description || '', price: Number(p.price), image: p.imageUrl || '' })))
+    })
+  }, [])
 
   // --- BOTTLE CART FUNCS ---
   const updateBottleQty = (id, delta) => {
@@ -43,10 +46,19 @@ export default function RivaVip({ onBack }) {
   }, 0)
 
   // --- ACTIONS ---
-  const handleBookingConfirm = (e) => {
+  const handleBookingConfirm = async (e) => {
     e.preventDefault()
-    setOrderComplete(true)
-    setTimeout(() => { setOrderComplete(false); onBack() }, 3000)
+    if (!customerName || !customerEmail || !bookingDate) return
+    setSubmitting(true)
+    try {
+      await bookings.vip({ name: customerName, email: customerEmail, date: bookingDate, guests: bookingGuests, packageId: selectedLoc.id })
+      setOrderComplete(true)
+      setTimeout(() => { setOrderComplete(false); onBack() }, 3000)
+    } catch (err) {
+      console.error('VIP booking failed:', err)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   // --- RENDER BOTTLES TAB ---
@@ -149,7 +161,7 @@ export default function RivaVip({ onBack }) {
   }
 
   return (
-    <div className="bg-brand-cream min-h-screen font-sans max-w-md mx-auto relative shadow-2xl overflow-hidden border-x border-brand-gold/10 text-brand-slate">
+    <div className="bg-brand-cream min-h-screen font-sans max-w-md md:max-w-3xl lg:max-w-4xl mx-auto relative shadow-2xl md:shadow-none overflow-hidden border-x border-brand-gold/10 md:border-x-0 text-brand-slate">
       
       {/* HEADER HERO */}
       <div className="bg-brand-burgundy/5 text-brand-slate p-6 pb-8 rounded-b-[2rem] relative z-20 shadow-sm border-b border-brand-gold/10">
@@ -194,7 +206,7 @@ export default function RivaVip({ onBack }) {
       </div>
 
       {/* CONTENT AREA */}
-      <div className="px-6 py-8 relative z-10">
+      <div className="px-6 md:px-10 py-8 relative z-10 max-w-2xl mx-auto">
         <AnimatePresence mode="wait">
           
           {activeTab === 'bottles' && !checkoutStep && <motion.div key="bottles" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 pb-32">
@@ -238,7 +250,7 @@ export default function RivaVip({ onBack }) {
 
             <AnimatePresence>
               {totalBottles > 0 && (
-                <motion.div initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }} className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 backdrop-blur-md border-t border-brand-gold/10 p-6 pb-safe z-[45] shadow-2xl">
+                <motion.div initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }} className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg bg-white/95 backdrop-blur-md border-t border-brand-gold/10 p-6 pb-safe z-[45] shadow-2xl">
                   <button className="w-full bg-brand-burgundy text-white rounded-2xl py-5 font-serif font-black text-xl flex justify-between items-center px-8 transition shadow-2xl shadow-brand-burgundy/20 active:scale-95">
                     <span className="flex items-center gap-3 italic"><GlassWater size={20} className="text-brand-gold"/> Ordina ({totalBottles})</span>
                     <span className="text-brand-gold font-black">€{totalBottlePrice}</span>
@@ -345,6 +357,12 @@ export default function RivaVip({ onBack }) {
 
               <form onSubmit={handleBookingConfirm} className="bg-brand-burgundy p-10 rounded-[3rem] shadow-2xl shadow-brand-burgundy/30">
                 <h3 className="text-white font-serif font-black text-2xl mb-8 italic border-b border-white/10 pb-4">Checkout VIP</h3>
+                <div className="space-y-4 mb-8">
+                  <input type="text" required placeholder="Nome e Cognome" value={customerName} onChange={e => setCustomerName(e.target.value)}
+                    className="w-full bg-white/10 border border-white/20 rounded-2xl px-4 py-4 font-serif font-bold text-white outline-none focus:ring-2 focus:ring-brand-gold/30 placeholder:text-white/30 text-center" />
+                  <input type="email" required placeholder="email@esempio.com" value={customerEmail} onChange={e => setCustomerEmail(e.target.value)}
+                    className="w-full bg-white/10 border border-white/20 rounded-2xl px-4 py-4 font-serif font-bold text-white outline-none focus:ring-2 focus:ring-brand-gold/30 placeholder:text-white/30 text-center" />
+                </div>
                 <div className="flex justify-between items-center text-white/50 text-[10px] uppercase font-black tracking-widest mb-6">
                   <span>Quota confirmatoria (100%)</span>
                   <span className="text-white">€{selectedLoc.price}</span>
@@ -353,8 +371,8 @@ export default function RivaVip({ onBack }) {
                   <span className="text-white/30 text-lg not-italic font-sans uppercase font-black tracking-widest">Totale</span>
                   <span>€{selectedLoc.price}</span>
                 </div>
-                <button type="submit" disabled={!bookingDate} className="w-full bg-white disabled:opacity-20 text-brand-burgundy font-serif font-black text-xl py-6 rounded-2xl mt-12 hover:bg-brand-cream transition-all shadow-xl active:scale-95">
-                  Conferma Prenotazione
+                <button type="submit" disabled={!bookingDate || !customerName || !customerEmail || submitting} className="w-full bg-white disabled:opacity-20 text-brand-burgundy font-serif font-black text-xl py-6 rounded-2xl mt-12 hover:bg-brand-cream transition-all shadow-xl active:scale-95">
+                  {submitting ? <Loader2 size={20} className="animate-spin" /> : 'Conferma Prenotazione'}
                 </button>
               </form>
             </motion.div>

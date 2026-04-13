@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, PartyPopper, Calendar, Users, Send, CheckCircle2, ChevronRight, MessageSquare, GlassWater, Utensils } from 'lucide-react'
+import { ChevronLeft, PartyPopper, Calendar, Users, Send, CheckCircle2, ChevronRight, MessageSquare, GlassWater, Utensils, Loader2 } from 'lucide-react'
+import { bookings } from './lib/api'
 
 const EVENT_TYPES = [
   { id: 'birthday', name: 'Compleanno in Spiaggia', icon: PartyPopper, desc: 'Festeggia il tuo giorno speciale con i piedi nella sabbia.', image: 'https://images.unsplash.com/photo-1530103043960-ef38714abb15?auto=format&fit=crop&q=80&w=800&h=600' },
@@ -16,14 +17,32 @@ export default function RivaEvents({ onBack }) {
   const [eventDate, setEventDate] = useState('')
   const [eventGuests, setEventGuests] = useState(20)
   const [comment, setComment] = useState('')
+  const [customerName, setCustomerName] = useState('')
+  const [customerEmail, setCustomerEmail] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 1 && !selectedType) return
     if (step === 2) {
-      setStep(3)
-      setTimeout(() => {
-        onBack()
-      }, 5000)
+      if (!customerName || !customerEmail || !eventDate) return
+      setSubmitting(true)
+      try {
+        await bookings.events({
+          name: customerName,
+          email: customerEmail,
+          date: eventDate,
+          eventType: selectedType.name,
+          eventGuests,
+          specialRequests: comment
+        })
+        setStep(3)
+        setTimeout(() => { onBack() }, 5000)
+      } catch (err) {
+        console.error('Event booking failed:', err)
+        alert('Errore nell\'invio della richiesta. Riprova.')
+      } finally {
+        setSubmitting(false)
+      }
       return
     }
     setStep(s => s + 1)
@@ -59,7 +78,7 @@ export default function RivaEvents({ onBack }) {
   }
 
   return (
-    <div className="bg-brand-cream min-h-screen font-sans max-w-md mx-auto relative shadow-2xl overflow-hidden border-x border-brand-gold/10 text-brand-slate">
+    <div className="bg-brand-cream min-h-screen font-sans max-w-md md:max-w-3xl lg:max-w-4xl mx-auto relative shadow-2xl md:shadow-none overflow-hidden border-x border-brand-gold/10 md:border-x-0 text-brand-slate">
       
       {/* HEADER HERO */}
       <div className="relative h-72 overflow-hidden">
@@ -92,7 +111,7 @@ export default function RivaEvents({ onBack }) {
       </div>
 
       {/* CONTENT AREA */}
-      <div className="px-8 -mt-8 relative z-20 pb-40">
+      <div className="px-8 md:px-10 -mt-8 relative z-20 pb-40 max-w-2xl mx-auto">
         <AnimatePresence mode="wait">
           
           {step === 1 && (
@@ -126,6 +145,14 @@ export default function RivaEvents({ onBack }) {
                 <h4 className="text-2xl font-serif font-black text-brand-burgundy mb-10 italic border-b border-brand-gold/10 pb-4 text-center">Your Vision</h4>
                 
                 <div className="space-y-10">
+                  <div className="text-center">
+                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold mb-6 block">Il Tuo Nome</label>
+                    <input type="text" value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="Nome e Cognome" className="w-full bg-brand-cream/50 border border-brand-gold/10 rounded-2xl px-6 py-4 font-serif font-bold text-brand-burgundy outline-none focus:ring-2 focus:ring-brand-gold/20 placeholder:text-brand-burgundy/20" />
+                  </div>
+                  <div className="text-center">
+                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold mb-6 block">La Tua Email</label>
+                    <input type="email" value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} placeholder="email@esempio.it" className="w-full bg-brand-cream/50 border border-brand-gold/10 rounded-2xl px-6 py-4 font-serif font-bold text-brand-burgundy outline-none focus:ring-2 focus:ring-brand-gold/20 placeholder:text-brand-burgundy/20" />
+                  </div>
                   <div className="text-center">
                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold mb-6 block">Data Desiderata</label>
                     <div className="relative">
@@ -169,13 +196,13 @@ export default function RivaEvents({ onBack }) {
       </div>
 
       {/* BOTTOM ACTION BAR */}
-      <motion.div initial={{ y: 100 }} animate={{ y: 0 }} className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 backdrop-blur-md border-t border-brand-gold/10 p-6 pb-safe z-40 shadow-2xl">
+      <motion.div initial={{ y: 100 }} animate={{ y: 0 }} className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg bg-white/95 backdrop-blur-md border-t border-brand-gold/10 p-6 pb-safe z-40 shadow-2xl">
         <button 
           onClick={handleNext}
-          disabled={step === 1 ? !selectedType : !eventDate}
+          disabled={step === 1 ? !selectedType : (!eventDate || !customerName || !customerEmail || submitting)}
           className="w-full bg-brand-burgundy disabled:opacity-20 text-white rounded-[2rem] py-6 font-serif font-black text-2xl italic flex items-center justify-center gap-4 hover:bg-black transition-all shadow-2xl shadow-brand-burgundy/20"
         >
-          {step === 1 ? 'Configure Event' : 'Send Inquiry'} <ChevronRight size={22} className="text-brand-gold" />
+          {submitting ? <><Loader2 size={22} className="animate-spin" /> Invio in corso...</> : <>{step === 1 ? 'Configure Event' : 'Send Inquiry'} <ChevronRight size={22} className="text-brand-gold" /></>}
         </button>
       </motion.div>
 

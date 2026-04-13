@@ -1,26 +1,51 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, CalendarDays, Users, Clock, Info, CheckCircle2, ChevronRight, CreditCard } from 'lucide-react'
+import { ChevronLeft, CalendarDays, Users, Clock, Info, CheckCircle2, ChevronRight, CreditCard, Loader2 } from 'lucide-react'
+import { catalog, bookings } from './lib/api'
 
 const TIME_SLOTS = ['12:30', '13:00', '13:30', '14:00', '14:30', '19:30', '20:00', '20:30', '21:00', '21:30']
-const ZONES = [
-  { id: 'terrazza', name: 'Terrazza Panoramica', desc: 'Vista mare frontale, brezza marina', price: 10, image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800&h=600' },
-  { id: 'sala', name: 'Sala Cristallo', desc: 'Aria condizionata, atmosfera intima', price: 0, image: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&q=80&w=800&h=600' }
-]
+
+const ZONE_IMAGES = {
+  'Terrazza Panoramica': 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800&h=600',
+  'Sala Cristallo': 'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&q=80&w=800&h=600'
+}
 
 export default function RivaRestaurant({ onBack }) {
-  const [step, setStep] = useState(1) // 1: Dettagli, 2: Zona, 3: Checkout, 4: Successo
+  const [ZONES, setZONES] = useState([])
+  const [step, setStep] = useState(1)
   const [guests, setGuests] = useState(2)
   const [date, setDate] = useState('')
   const [time, setTime] = useState('')
   const [zone, setZone] = useState(null)
-  
+  const [customerName, setCustomerName] = useState('')
+  const [customerEmail, setCustomerEmail] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    catalog.zones('RESTAURANT').then(zones => {
+      setZONES(zones.map(z => ({ id: z.id, name: z.name, desc: z.description || '', price: Number(z.supplement), image: ZONE_IMAGES[z.name] || '' })))
+    })
+  }, [])
+
   const caparraPerPersona = 10
   const totalCaparra = guests * caparraPerPersona + (zone?.price || 0)
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 1 && (!date || !time)) return
     if (step === 2 && !zone) return
+    if (step === 3) {
+      if (!customerName || !customerEmail) return
+      setSubmitting(true)
+      try {
+        await bookings.restaurant({ name: customerName, email: customerEmail, date, timeSlot: time, guests, zoneId: zone.id })
+        setStep(4)
+      } catch (err) {
+        console.error('Booking failed:', err)
+      } finally {
+        setSubmitting(false)
+      }
+      return
+    }
     setStep(s => s + 1)
   }
 
@@ -155,6 +180,13 @@ export default function RivaRestaurant({ onBack }) {
           </div>
         </div>
 
+        <div className="w-full space-y-4 mb-6">
+          <input type="text" required placeholder="Nome e Cognome" value={customerName} onChange={e => setCustomerName(e.target.value)}
+            className="w-full bg-brand-cream/30 border border-brand-gold/10 rounded-2xl px-4 py-4 font-serif font-bold text-brand-burgundy outline-none focus:ring-2 focus:ring-brand-gold/20 placeholder:font-sans placeholder:font-medium placeholder:text-brand-slate/30 text-center" />
+          <input type="email" required placeholder="email@esempio.com" value={customerEmail} onChange={e => setCustomerEmail(e.target.value)}
+            className="w-full bg-brand-cream/30 border border-brand-gold/10 rounded-2xl px-4 py-4 font-serif font-bold text-brand-burgundy outline-none focus:ring-2 focus:ring-brand-gold/20 placeholder:font-sans placeholder:font-medium placeholder:text-brand-slate/30 text-center" />
+        </div>
+
         <div className="w-full bg-brand-cream/50 p-6 rounded-3xl border border-brand-gold/10 relative overflow-hidden">
            <div className="absolute top-0 right-0 p-2 opacity-10"><Info size={40} /></div>
           <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest mb-3 text-brand-slate/40">
@@ -210,7 +242,7 @@ export default function RivaRestaurant({ onBack }) {
 
 
   return (
-    <div className="bg-brand-cream min-h-screen font-sans max-w-md mx-auto relative shadow-2xl overflow-hidden border-x border-brand-gold/10">
+    <div className="bg-brand-cream min-h-screen font-sans max-w-md md:max-w-3xl lg:max-w-4xl mx-auto relative shadow-2xl md:shadow-none overflow-hidden border-x border-brand-gold/10 md:border-x-0">
       
       {/* HEADER HERO */}
       <div className="relative h-64 overflow-hidden">
@@ -249,7 +281,7 @@ export default function RivaRestaurant({ onBack }) {
       </div>
 
       {/* CONTENT AREA */}
-      <div className="px-6 py-10 relative z-20 pb-40">
+      <div className="px-6 md:px-10 py-10 relative z-20 pb-40 max-w-2xl mx-auto">
         <AnimatePresence mode="wait">
           {step === 1 && <motion.div key="step1">{renderStep1()}</motion.div>}
           {step === 2 && <motion.div key="step2">{renderStep2()}</motion.div>}
@@ -262,7 +294,7 @@ export default function RivaRestaurant({ onBack }) {
       {step < 4 && (
         <motion.div 
           initial={{ y: 100 }} animate={{ y: 0 }}
-          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 backdrop-blur-md border-t border-brand-gold/10 p-6 pb-safe z-40 shadow-2xl"
+          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg bg-white/95 backdrop-blur-md border-t border-brand-gold/10 p-6 pb-safe z-40 shadow-2xl"
         >
           <div className="max-w-md mx-auto">
             {step === 3 ? (
@@ -270,7 +302,7 @@ export default function RivaRestaurant({ onBack }) {
                 onClick={handleNext}
                 className="w-full bg-brand-burgundy text-white rounded-2xl py-5 font-serif font-black text-xl flex items-center justify-center gap-3 shadow-xl shadow-brand-burgundy/20 hover:scale-[1.02] active:scale-95 transition-all"
               >
-                Paga Caparra €{totalCaparra} <ChevronRight size={20} className="text-brand-gold" />
+                {submitting ? <Loader2 size={20} className="animate-spin" /> : <>Paga Caparra €{totalCaparra} <ChevronRight size={20} className="text-brand-gold" /></>}
               </button>
             ) : (
               <button 

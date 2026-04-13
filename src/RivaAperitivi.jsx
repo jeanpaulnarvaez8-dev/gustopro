@@ -1,58 +1,48 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, Sunset, Star, Clock, MapPin, CheckCircle2, ChevronRight, Info } from 'lucide-react'
-
-// Mock Data for sunset packages
-const APERITIVO_PACKAGES = [
-  { 
-    id: 'gold', 
-    name: 'Golden Hour Experience', 
-    desc: 'Calice di Franciacorta o cocktail a scelta, accompagnato da un plateau royale di crudi di mare e finger food gourmet.', 
-    price: 35.00, 
-    popular: true,
-    image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=600&h=400' 
-  },
-  { 
-    id: 'classic', 
-    name: 'Riva Sunset Classic', 
-    desc: 'Due drink a scelta dalla nostra drink list e tagliere selezione di salumi e formaggi del territorio con focaccia calda.', 
-    price: 25.00, 
-    popular: false,
-    image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&q=80&w=600&h=400' 
-  },
-  { 
-    id: 'sushi', 
-    name: 'Sushi & Bubbles', 
-    desc: 'Bottiglia di Prosecco Valdobbiadene DOCG e barca di sushi misto (24 pezzi) preparato dal nostro Master Sushi Chef.', 
-    price: 60.00, 
-    popular: false,
-    image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&q=80&w=600&h=400' 
-  }
-]
+import { ChevronLeft, Sunset, Star, Clock, MapPin, CheckCircle2, ChevronRight, Info, Loader2 } from 'lucide-react'
+import { catalog, bookings } from './lib/api'
 
 const TIME_SLOTS = ['18:00 - 19:30', '19:00 - 20:30', '19:30 - 21:00']
-const ZONES = [
-  { id: 'front', name: 'Prima Fila Mare', desc: 'Sulla sabbia, in prima fila', price: 10 },
-  { id: 'terrace', name: 'Lounge Terrazza', desc: 'Area rialzata con divanetti', price: 0 }
-]
 
 export default function RivaAperitivi({ onBack }) {
-  const [step, setStep] = useState(1) // 1: Pacchetto, 2: Dettagli (Ora/Zona/Pax), 3: Riepilogo
+  const [APERITIVO_PACKAGES, setPackages] = useState([])
+  const [ZONES, setZones] = useState([])
+  const [step, setStep] = useState(1)
   const [selectedPackage, setSelectedPackage] = useState(null)
   const [guests, setGuests] = useState(2)
   const [time, setTime] = useState('')
   const [zone, setZone] = useState('')
+  const [customerName, setCustomerName] = useState('')
+  const [customerEmail, setCustomerEmail] = useState('')
   const [orderComplete, setOrderComplete] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleNext = () => {
+  useEffect(() => {
+    catalog.aperitivoPackages().then(pkgs => {
+      setPackages(pkgs.map(p => ({ id: p.id, name: p.name, desc: p.description || '', price: Number(p.price), popular: p.isPopular, image: p.imageUrl || '' })))
+    })
+    catalog.zones('APERITIVO').then(zones => {
+      setZones(zones.map(z => ({ id: z.id, name: z.name, desc: z.description || '', price: Number(z.supplement) })))
+    })
+  }, [])
+
+  const handleNext = async () => {
     if (step === 1 && !selectedPackage) return
     if (step === 2 && (!time || !zone)) return
     if (step === 3) {
-      setOrderComplete(true)
-      setTimeout(() => {
-        setOrderComplete(false)
-        onBack()
-      }, 3500)
+      if (!customerName || !customerEmail) return
+      setSubmitting(true)
+      try {
+        const today = new Date().toISOString().split('T')[0]
+        await bookings.aperitivo({ name: customerName, email: customerEmail, date: today, timeSlot: time, guests, packageId: selectedPackage.id, zoneId: zone })
+        setOrderComplete(true)
+        setTimeout(() => { setOrderComplete(false); onBack() }, 3500)
+      } catch (err) {
+        console.error('Booking failed:', err)
+      } finally {
+        setSubmitting(false)
+      }
       return
     }
     setStep(s => s + 1)
@@ -85,7 +75,7 @@ export default function RivaAperitivi({ onBack }) {
   }
 
   return (
-    <div className="bg-brand-cream min-h-screen font-sans max-w-md mx-auto relative shadow-2xl overflow-hidden border-x border-brand-gold/10 text-brand-slate">
+    <div className="bg-brand-cream min-h-screen font-sans max-w-md md:max-w-3xl lg:max-w-4xl mx-auto relative shadow-2xl md:shadow-none overflow-hidden border-x border-brand-gold/10 md:border-x-0 text-brand-slate">
       
       {/* HEADER HERO */}
       <div className="relative h-64 overflow-hidden">
@@ -118,7 +108,7 @@ export default function RivaAperitivi({ onBack }) {
       </div>
 
       {/* CONTENT AREA */}
-      <div className="px-6 py-10 relative z-20 pb-40">
+      <div className="px-6 md:px-10 py-10 relative z-20 pb-40 max-w-2xl mx-auto">
         <AnimatePresence mode="wait">
           
           {/* STEP 1: SCEGLI IL PACCHETTO */}
@@ -251,7 +241,13 @@ export default function RivaAperitivi({ onBack }) {
                   </div>
                 </div>
                 
-                <p className="text-[8px] text-brand-slate/30 font-black uppercase tracking-[0.3em] mt-8 flex justify-center items-center gap-2">
+                <div className="w-full space-y-4 mt-8">
+                  <input type="text" required placeholder="Nome e Cognome" value={customerName} onChange={e => setCustomerName(e.target.value)}
+                    className="w-full bg-brand-cream/30 border border-brand-gold/10 rounded-2xl px-4 py-4 font-serif font-bold text-brand-burgundy outline-none focus:ring-2 focus:ring-brand-gold/20 placeholder:font-sans placeholder:font-medium placeholder:text-brand-slate/30 text-center" />
+                  <input type="email" required placeholder="email@esempio.com" value={customerEmail} onChange={e => setCustomerEmail(e.target.value)}
+                    className="w-full bg-brand-cream/30 border border-brand-gold/10 rounded-2xl px-4 py-4 font-serif font-bold text-brand-burgundy outline-none focus:ring-2 focus:ring-brand-gold/20 placeholder:font-sans placeholder:font-medium placeholder:text-brand-slate/30 text-center" />
+                </div>
+                <p className="text-[8px] text-brand-slate/30 font-black uppercase tracking-[0.3em] mt-4 flex justify-center items-center gap-2">
                    Pagamento in loco presso Riva Beach Salento
                 </p>
               </div>
@@ -264,7 +260,7 @@ export default function RivaAperitivi({ onBack }) {
       {/* BOTTOM ACTION BAR */}
       <motion.div 
         initial={{ y: 100 }} animate={{ y: 0 }}
-        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 backdrop-blur-md border-t border-brand-gold/10 p-6 pb-safe z-[45] shadow-2xl"
+        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg bg-white/95 backdrop-blur-md border-t border-brand-gold/10 p-6 pb-safe z-[45] shadow-2xl"
       >
         <div className="max-w-md mx-auto">
           {step === 3 ? (
@@ -272,7 +268,7 @@ export default function RivaAperitivi({ onBack }) {
               onClick={handleNext}
               className="w-full bg-brand-burgundy text-white rounded-2xl py-5 font-serif font-black text-xl hover:bg-black transition-all shadow-xl shadow-brand-burgundy/30 active:scale-95 flex items-center justify-center gap-3"
             >
-              Conferma Sunset <ChevronRight size={20} className="text-brand-gold" />
+              {submitting ? <Loader2 size={20} className="animate-spin" /> : <>Conferma Sunset <ChevronRight size={20} className="text-brand-gold" /></>}
             </button>
           ) : (
             <button 

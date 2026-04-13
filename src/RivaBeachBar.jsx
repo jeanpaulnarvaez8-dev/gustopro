@@ -1,23 +1,26 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ShoppingBag, Plus, Minus, CreditCard, MapPin, X, CheckCircle2 } from 'lucide-react'
-
-// Mock Data with realistic Unsplash images
-const barMenu = [
-  { id: '1', category: 'Cocktails', name: 'Riva Signature Spritz', desc: 'Aperol, Prosecco Superiore, Soda, Fetta d\'arancia bio', price: 14.00, image: 'https://images.unsplash.com/photo-1560512823-829485b8bf24?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: '2', category: 'Cocktails', name: 'Mojito Beach', desc: 'Rum Havana 7, Lime fresco, Menta, Zucchero di Canna, Soda', price: 16.00, image: 'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: '3', category: 'Snacks', name: 'Tagliere Imperiale', desc: 'Salmone affumicato, ostriche Fine de Claire, gamberi rossi', price: 35.00, image: 'https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: '4', category: 'Snacks', name: 'Club Sandwich Gourmet', desc: 'Pollo ruspante, bacon croccante, uovo bio, pomodoro, lattuga, patatine dipper', price: 22.00, image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: '5', category: 'Smoothies', name: 'Tropical Detox', desc: 'Ananas, Cocco, Mango, Zenzero', price: 12.00, image: 'https://images.unsplash.com/photo-1623065123547-4180d216fe81?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: '6', category: 'Smoothies', name: 'Berry Blast', desc: 'Mirtilli, Lamponi, Fragole, Latte di Mandorla', price: 12.00, image: 'https://images.unsplash.com/photo-1628557044797-f21a177c37ec?auto=format&fit=crop&q=80&w=400&h=400' },
-]
+import { ChevronLeft, ShoppingBag, Plus, Minus, CreditCard, MapPin, X, CheckCircle2, Loader2 } from 'lucide-react'
+import { catalog, bookings } from './lib/api'
 
 export default function RivaBeachBar({ onBack }) {
+  const [barMenu, setBarMenu] = useState([])
+  const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('Tutti')
   const [cart, setCart] = useState({}) // { id: quantity }
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
   const [locationCode, setLocationCode] = useState('')
+  const [customerName, setCustomerName] = useState('')
+  const [customerEmail, setCustomerEmail] = useState('')
   const [orderComplete, setOrderComplete] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    catalog.menu('BEACH_BAR').then(items => {
+      setBarMenu(items.map(i => ({ id: i.id, category: i.category, name: i.name, desc: i.description || '', price: Number(i.price), image: i.imageUrl || '' })))
+      setLoading(false)
+    }).catch(() => setLoading(false))
+  }, [])
 
   const categories = ['Tutti', ...new Set(barMenu.map(item => item.category))]
 
@@ -53,16 +56,21 @@ export default function RivaBeachBar({ onBack }) {
     setIsCheckoutOpen(true)
   }
 
-  const confirmOrder = (e) => {
+  const confirmOrder = async (e) => {
     e.preventDefault()
-    if (!locationCode) return
-    setIsCheckoutOpen(false)
-    setOrderComplete(true)
-    setTimeout(() => {
-      setOrderComplete(false)
-      setCart({})
-      onBack()
-    }, 3000)
+    if (!locationCode || !customerName || !customerEmail) return
+    setSubmitting(true)
+    try {
+      const items = Object.entries(cart).map(([menuItemId, quantity]) => ({ menuItemId, quantity }))
+      await bookings.beachBar({ name: customerName, email: customerEmail, locationCode, items })
+      setIsCheckoutOpen(false)
+      setOrderComplete(true)
+      setTimeout(() => { setOrderComplete(false); setCart({}); onBack() }, 3000)
+    } catch (err) {
+      console.error('Order failed:', err)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   // --- RENDERING ---
@@ -87,7 +95,7 @@ export default function RivaBeachBar({ onBack }) {
   }
 
   return (
-    <div className="bg-brand-cream min-h-screen font-sans max-w-md mx-auto relative shadow-2xl overflow-hidden border-x border-brand-gold/10">
+    <div className="bg-brand-cream min-h-screen font-sans max-w-md md:max-w-3xl lg:max-w-5xl mx-auto relative shadow-2xl md:shadow-none overflow-hidden border-x border-brand-gold/10 md:border-x-0">
       
       {/* HEADER HERO */}
       <div className="relative h-64 overflow-hidden">
@@ -132,7 +140,7 @@ export default function RivaBeachBar({ onBack }) {
       </div>
 
       {/* MENU LIST */}
-      <div className="px-6 py-10 space-y-8 pb-40">
+      <div className="px-6 md:px-10 py-10 pb-40 grid grid-cols-1 md:grid-cols-2 gap-8">
         <AnimatePresence mode="popLayout">
           {filteredMenu.map(item => {
             const qty = getItemQuantity(item.id)
@@ -201,7 +209,7 @@ export default function RivaBeachBar({ onBack }) {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 w-full max-w-md px-6 z-40"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg px-6 z-40"
           >
             <button 
               onClick={handleCheckout}
@@ -242,7 +250,7 @@ export default function RivaBeachBar({ onBack }) {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: "spring", stiffness: 300, damping: 32 }}
-              className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-brand-cream rounded-t-[3rem] z-50 pt-2 pb-safe shadow-2xl border-t border-brand-gold/20"
+              className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg bg-brand-cream rounded-t-[3rem] z-50 pt-2 pb-safe shadow-2xl border-t border-brand-gold/20"
             >
               <div className="w-12 h-1 bg-brand-gold/30 rounded-full mx-auto my-4"></div>
               
@@ -294,6 +302,27 @@ export default function RivaBeachBar({ onBack }) {
                   </div>
 
                   <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold flex items-center gap-2">
+                       Il tuo nome
+                    </label>
+                    <input
+                      type="text" required placeholder="Nome e Cognome" value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      className="w-full bg-white border border-brand-gold/10 rounded-2xl px-4 py-5 text-base focus:outline-none focus:ring-2 focus:ring-brand-gold/30 transition-all font-serif font-bold placeholder:font-sans placeholder:font-medium placeholder:text-brand-slate/30"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold flex items-center gap-2">
+                       La tua email
+                    </label>
+                    <input
+                      type="email" required placeholder="email@esempio.com" value={customerEmail}
+                      onChange={(e) => setCustomerEmail(e.target.value)}
+                      className="w-full bg-white border border-brand-gold/10 rounded-2xl px-4 py-5 text-base focus:outline-none focus:ring-2 focus:ring-brand-gold/30 transition-all font-serif font-bold placeholder:font-sans placeholder:font-medium placeholder:text-brand-slate/30"
+                    />
+                  </div>
+
+                  <div className="space-y-3">
                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold">
                        Metodo di pagamento
                     </label>
@@ -310,11 +339,12 @@ export default function RivaBeachBar({ onBack }) {
                     </div>
                   </div>
 
-                  <button 
+                  <button
                     type="submit"
-                    className="w-full bg-brand-burgundy text-white rounded-2xl py-5 font-serif font-black text-xl hover:bg-black transition-all shadow-xl shadow-brand-burgundy/20 active:scale-95 flex items-center justify-center gap-3"
+                    disabled={submitting}
+                    className="w-full bg-brand-burgundy text-white rounded-2xl py-5 font-serif font-black text-xl hover:bg-black transition-all shadow-xl shadow-brand-burgundy/20 active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50"
                   >
-                    Effettua Ordine
+                    {submitting ? <Loader2 size={20} className="animate-spin" /> : 'Effettua Ordine'}
                   </button>
                   <p className="text-center text-[9px] text-brand-slate/30 font-bold uppercase tracking-widest">Servizio garantito Riva Beach Salento</p>
                 </form>

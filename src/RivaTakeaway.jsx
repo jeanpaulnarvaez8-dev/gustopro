@@ -1,26 +1,29 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ShoppingBag, Plus, Minus, CheckCircle2, ChevronRight, Clock, MapPin, Bike } from 'lucide-react'
-
-// Take-away Mock Data
-const TAKEAWAY_MENU = [
-  { id: 't1', category: 'Panini', name: 'Puccia Salentina Salumi', desc: 'Puccia artigianale con capocollo di Martina Franca, caciocavallo e pomodori secchi.', price: 9.00, image: 'https://images.unsplash.com/photo-1550507992-eb63ffee0847?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: 't2', category: 'Panini', name: 'Puccia Vegetariana', desc: 'Puccia artigianale con melanzane grigliate, stracciatella e pesto di basilico.', price: 8.50, image: 'https://images.unsplash.com/photo-1547526323-28876c12de4b?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: 't3', category: 'Insalate', name: 'Insalata Jonica', desc: 'Insalata mista, tonno fresco scottato, olive taggiasche, pomodorini e crostini.', price: 12.00, image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: 't4', category: 'Frutta', name: 'Cocco in Ghiaccio', desc: 'Fettine di cocco fresco servite su letto di ghiaccio triturato.', price: 5.00, image: 'https://images.unsplash.com/photo-1525385133335-86d8fe529683?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: 't5', category: 'Bibite', name: 'Caffé in Ghiaccio con Latte di Mandorla', desc: 'Il classico caffè salentino rinfrescante.', price: 3.50, image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: 't6', category: 'Bibite', name: 'Acqua Naturale (500ml)', desc: 'Bottiglietta d\'acqua fresca.', price: 2.00, image: 'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&q=80&w=400&h=400' },
-  { id: 't7', category: 'Bibite', name: 'Tropical Detox', desc: 'Centrifugato di mango, ananas e menta fresca.', price: 6.50, image: 'https://images.unsplash.com/photo-1623065422902-30a2ad4492bf?auto=format&fit=crop&q=80&w=400&h=400' },
-]
+import { ChevronLeft, ShoppingBag, Plus, Minus, CheckCircle2, ChevronRight, Clock, MapPin, Bike, Loader2 } from 'lucide-react'
+import { catalog, bookings } from './lib/api'
 
 const PICKUP_TIMES = ['Il prima possibile (15 min)', 'Tra 30 minuti', 'Tra 1 Ora', 'Tra 2 Ore']
 
 export default function RivaTakeaway({ onBack }) {
+  const [TAKEAWAY_MENU, setMenu] = useState([])
+  const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('Tutti')
   const [cart, setCart] = useState({})
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
   const [pickupTime, setPickupTime] = useState(PICKUP_TIMES[0])
   const [orderComplete, setOrderComplete] = useState(false)
+  const [orderNumber, setOrderNumber] = useState('')
+  const [customerName, setCustomerName] = useState('')
+  const [customerEmail, setCustomerEmail] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    catalog.menu('TAKEAWAY').then(items => {
+      setMenu(items.map(i => ({ id: i.id, category: i.category, name: i.name, desc: i.description || '', price: Number(i.price), image: i.imageUrl || '' })))
+      setLoading(false)
+    }).catch(() => setLoading(false))
+  }, [])
 
   const categories = ['Tutti', ...new Set(TAKEAWAY_MENU.map(item => item.category))]
 
@@ -46,16 +49,26 @@ export default function RivaTakeaway({ onBack }) {
   }, 0), [cart])
 
   // --- ACTIONS ---
-  const confirmOrder = (e) => {
+  const confirmOrder = async (e) => {
     e.preventDefault()
-    setIsCheckoutOpen(false)
-    setOrderComplete(true)
-    setTimeout(() => { setOrderComplete(false); setCart({}); onBack() }, 3000)
+    if (!customerName || !customerEmail) return
+    setSubmitting(true)
+    try {
+      const items = Object.entries(cart).map(([menuItemId, quantity]) => ({ menuItemId, quantity }))
+      const result = await bookings.takeaway({ name: customerName, email: customerEmail, pickupTime, items })
+      setOrderNumber(result.orderNumber || `RVB-${Math.floor(100 + Math.random() * 900)}`)
+      setIsCheckoutOpen(false)
+      setOrderComplete(true)
+      setTimeout(() => { setOrderComplete(false); setCart({}); onBack() }, 3000)
+    } catch (err) {
+      console.error('Order failed:', err)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   // --- SUCCESS RECIEPT SCREEN ---
   if (orderComplete) {
-    const orderNumber = Math.floor(100 + Math.random() * 900)
     return (
       <div className="min-h-screen bg-brand-cream flex flex-col items-center justify-center p-8 text-center animate-fade-in text-brand-slate max-w-md mx-auto relative overflow-hidden">
         <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white text-brand-slate rounded-[3rem] p-10 w-full max-w-sm shadow-2xl relative border border-brand-gold/10">
@@ -86,7 +99,7 @@ export default function RivaTakeaway({ onBack }) {
   }
 
   return (
-    <div className="bg-brand-cream min-h-screen font-sans max-w-md mx-auto relative shadow-2xl overflow-hidden border-x border-brand-gold/10 text-brand-slate">
+    <div className="bg-brand-cream min-h-screen font-sans max-w-md md:max-w-3xl lg:max-w-5xl mx-auto relative shadow-2xl md:shadow-none overflow-hidden border-x border-brand-gold/10 md:border-x-0 text-brand-slate">
       
       {/* HEADER HERO */}
       <div className="relative h-64 overflow-hidden">
@@ -128,7 +141,7 @@ export default function RivaTakeaway({ onBack }) {
       </div>
 
       {/* MENU LIST */}
-      <div className="px-6 py-10 space-y-6 pb-40">
+      <div className="px-6 md:px-10 py-10 pb-40 grid grid-cols-1 md:grid-cols-2 gap-6">
         <AnimatePresence mode="popLayout">
           {filteredMenu.map(item => {
             const qty = getItemQuantity(item.id)
@@ -169,7 +182,7 @@ export default function RivaTakeaway({ onBack }) {
       {/* FLOATING CART BUTTON */}
       <AnimatePresence>
         {totalItems > 0 && !isCheckoutOpen && (
-          <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 backdrop-blur-md border-t border-brand-gold/10 p-6 pb-safe z-40 shadow-2xl">
+          <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg bg-white/95 backdrop-blur-md border-t border-brand-gold/10 p-6 pb-safe z-40 shadow-2xl">
             <button onClick={() => setIsCheckoutOpen(true)} className="w-full bg-brand-burgundy text-white rounded-[1.5rem] py-5 flex justify-between items-center shadow-2xl shadow-brand-burgundy/20 hover:bg-black active:scale-[0.98] transition-all px-8">
               <div className="flex items-center gap-4">
                 <div className="relative">
@@ -191,9 +204,9 @@ export default function RivaTakeaway({ onBack }) {
       <AnimatePresence>
         {isCheckoutOpen && (
           <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsCheckoutOpen(false)} className="fixed inset-0 bg-brand-slate/60 backdrop-blur-md z-50 max-w-md mx-auto" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsCheckoutOpen(false)} className="fixed inset-0 bg-brand-slate/60 backdrop-blur-md z-50" />
             
-            <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white rounded-t-[3rem] z-50 pt-4 pb-safe shadow-2xl overflow-hidden">
+            <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg bg-white rounded-t-[3rem] z-50 pt-4 pb-safe shadow-2xl overflow-hidden">
               <div className="w-12 h-1 bg-brand-gold/20 rounded-full mx-auto my-4"></div>
               
               <div className="px-8 py-6 max-h-[80vh] overflow-y-auto no-scrollbar">
@@ -225,6 +238,12 @@ export default function RivaTakeaway({ onBack }) {
                 </div>
 
                 <form onSubmit={confirmOrder} className="space-y-8">
+                  <div className="space-y-4">
+                    <input type="text" required placeholder="Nome e Cognome" value={customerName} onChange={e => setCustomerName(e.target.value)}
+                      className="w-full bg-brand-cream/30 border border-brand-gold/10 rounded-2xl px-4 py-4 font-serif font-bold text-brand-burgundy outline-none focus:ring-2 focus:ring-brand-gold/20 placeholder:font-sans placeholder:font-medium placeholder:text-brand-slate/30 text-center" />
+                    <input type="email" required placeholder="email@esempio.com" value={customerEmail} onChange={e => setCustomerEmail(e.target.value)}
+                      className="w-full bg-brand-cream/30 border border-brand-gold/10 rounded-2xl px-4 py-4 font-serif font-bold text-brand-burgundy outline-none focus:ring-2 focus:ring-brand-gold/20 placeholder:font-sans placeholder:font-medium placeholder:text-brand-slate/30 text-center" />
+                  </div>
                   <div className="text-center">
                     <label className="block text-[10px] font-black text-brand-gold uppercase tracking-[0.3em] mb-4">Orario di Ritiro</label>
                     <select 
@@ -235,8 +254,8 @@ export default function RivaTakeaway({ onBack }) {
                     </select>
                   </div>
 
-                  <button type="submit" className="w-full bg-brand-burgundy text-white rounded-[2rem] py-6 font-serif font-black text-2xl italic shadow-2xl shadow-brand-burgundy/20 hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-4">
-                    Conferma Pagamento <ChevronRight size={20} className="text-brand-gold" />
+                  <button type="submit" disabled={submitting} className="w-full bg-brand-burgundy text-white rounded-[2rem] py-6 font-serif font-black text-2xl italic shadow-2xl shadow-brand-burgundy/20 hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-4 disabled:opacity-50">
+                    {submitting ? <Loader2 size={20} className="animate-spin" /> : <>Conferma Ordine <ChevronRight size={20} className="text-brand-gold" /></>}
                   </button>
                   <button type="button" onClick={() => setIsCheckoutOpen(false)} className="w-full py-2 font-black text-[10px] uppercase tracking-[0.4em] text-brand-slate/30 hover:text-brand-burgundy transition-colors mb-4">
                     Continua Esplorazione
