@@ -37,7 +37,7 @@ app.get("/api/health", (_req, res) => {
 if (isProd) {
   const distPath = path.resolve(__dirname, "../../dist");
   app.use(express.static(distPath, { maxAge: "1y", immutable: true }));
-  app.get("*", (_req, res) => {
+  app.get("/{*splat}", (_req, res) => {
     res.sendFile(path.join(distPath, "index.html"));
   });
 }
