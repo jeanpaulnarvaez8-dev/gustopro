@@ -2,7 +2,7 @@
 set -e
 
 echo "🔧 Syncing database schema..."
-npx prisma db push --url "$DATABASE_URL" --skip-generate
+npx prisma db push --url "$DATABASE_URL"
 
 echo "🌱 Checking if seed is needed..."
 npx tsx scripts/seed-if-empty.ts || {
